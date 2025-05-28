@@ -16,16 +16,35 @@ const generateOrderNumber = async () => {
   const year = date.getFullYear().toString().slice(-2);
   const month = (date.getMonth() + 1).toString().padStart(2, "0");
   const day = date.getDate().toString().padStart(2, "0");
+  const prefix = `${year}${month}${day}`;
 
-  // Get the count of orders for today
-  const today = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-  const count = await Order.countDocuments({
-    orderTime: { $gte: today },
-  });
+  // Start a session for transaction
+  const session = await Order.startSession();
+  try {
+    let orderNumber;
+    await session.withTransaction(async () => {
+      // Get the latest order number for today
+      const latestOrder = await Order.findOne(
+        { orderNumber: new RegExp(`^${prefix}`) },
+        { orderNumber: 1 },
+        { session }
+      ).sort({ orderNumber: -1 });
 
-  // Generate order number in format: YYMMDD-XXXX
-  const sequence = (count + 1).toString().padStart(4, "0");
-  return `${year}${month}${day}-${sequence}`;
+      let sequence = 1;
+      if (latestOrder) {
+        // Extract the sequence number from the latest order
+        const latestSequence = parseInt(latestOrder.orderNumber.split("-")[1]);
+        sequence = latestSequence + 1;
+      }
+
+      // Generate new order number
+      orderNumber = `${prefix}-${sequence.toString().padStart(4, "0")}`;
+    });
+
+    return orderNumber;
+  } finally {
+    await session.endSession();
+  }
 };
 
 // Get all orders
