@@ -24,6 +24,10 @@ const MobileCheckout = () => {
   const [startX, setStartX] = useState(0);
   const [currentX, setCurrentX] = useState(0);
   const [isSwipingMain, setIsSwipingMain] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStartX, setDragStartX] = useState(0);
+  const [dragCurrentX, setDragCurrentX] = useState(0);
+  const swipeButtonRef = useRef(null);
 
   // Calculate totals - Keep these definitions here as they are used in the return statement
   const itemTotal = selectedItems.reduce(
@@ -116,7 +120,7 @@ const MobileCheckout = () => {
       if (isSwipingMain) {
         const diff = currentX - startX;
         // Define a threshold for a successful swipe (e.g., 50 pixels to the right)
-        const swipeThreshold = 50;
+        const swipeThreshold = 30;
 
         if (diff > swipeThreshold) {
           // Swiped right - navigate back
@@ -141,6 +145,56 @@ const MobileCheckout = () => {
       container.removeEventListener("touchend", handleTouchEnd);
     };
   }, [startX, currentX, isSwipingMain, navigate]); // Add dependencies
+
+  const handleDragStart = (e) => {
+    // Only start dragging if the click/touch is on the swipe button
+    if (!e.target.closest(`.${mobileCheckoutStyles.swipeToOrderContainer}`)) {
+      return;
+    }
+    e.preventDefault(); // Prevent default behavior
+    setIsDragging(true);
+    const clientX = e.type === "mousedown" ? e.clientX : e.touches[0].clientX;
+    setDragStartX(clientX);
+    setDragCurrentX(clientX);
+  };
+
+  const handleDragMove = (e) => {
+    if (!isDragging) return;
+    e.preventDefault(); // Prevent default behavior
+    const clientX = e.type === "mousemove" ? e.clientX : e.touches[0].clientX;
+    setDragCurrentX(clientX);
+  };
+
+  const handleDragEnd = (e) => {
+    if (!isDragging) return;
+    e.preventDefault(); // Prevent default behavior
+    setIsDragging(false);
+    setDragCurrentX(dragStartX);
+  };
+
+  useEffect(() => {
+    const button = swipeButtonRef.current;
+    if (!button) return;
+
+    // Only add event listeners to the button container
+    button.addEventListener("mousedown", handleDragStart);
+    button.addEventListener("touchstart", handleDragStart, { passive: false });
+
+    // Add move and end listeners to window to handle dragging outside the button
+    window.addEventListener("mousemove", handleDragMove);
+    window.addEventListener("touchmove", handleDragMove, { passive: false });
+    window.addEventListener("mouseup", handleDragEnd);
+    window.addEventListener("touchend", handleDragEnd);
+
+    return () => {
+      button.removeEventListener("mousedown", handleDragStart);
+      button.removeEventListener("touchstart", handleDragStart);
+      window.removeEventListener("mousemove", handleDragMove);
+      window.removeEventListener("touchmove", handleDragMove);
+      window.removeEventListener("mouseup", handleDragEnd);
+      window.removeEventListener("touchend", handleDragEnd);
+    };
+  }, [isDragging]);
 
   // Function to handle placing the order
   const handlePlaceOrder = useCallback(async () => {
@@ -181,13 +235,16 @@ const MobileCheckout = () => {
     };
 
     try {
-      const response = await fetch("https://resta-project-2.onrender.com/api/orders/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(orderData),
-      });
+      const response = await fetch(
+        "https://resta-project-2.onrender.com/api/orders/",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(orderData),
+        }
+      );
 
       if (response.ok) {
         const result = await response.json();
@@ -454,14 +511,22 @@ const MobileCheckout = () => {
         </div>
       </div>
 
-      {/* Swipe to Order Button - Now just a clickable button */}
+      {/* Swipe to Order Button */}
       <div
+        ref={swipeButtonRef}
         className={mobileCheckoutStyles.placeOrderButtonFixed}
-        // Add onClick handler
+        style={{ userSelect: "none" }}
       >
-        {/* Keeping the visual structure inside */}
         <div className={mobileCheckoutStyles.swipeToOrderContainer}>
-          <div className={mobileCheckoutStyles.swipeIconContainer}>
+          <div
+            className={mobileCheckoutStyles.swipeIconContainer}
+            style={{
+              transform: isDragging
+                ? `translateX(${dragCurrentX - dragStartX}px)`
+                : undefined,
+              transition: isDragging ? "none" : "transform 0.3s ease-out",
+            }}
+          >
             <span className={mobileCheckoutStyles.swipeIcon}>→</span>
           </div>
           <span className={mobileCheckoutStyles.swipeText}>Swipe to Order</span>
