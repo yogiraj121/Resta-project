@@ -3,7 +3,7 @@ import axios from "axios";
 import styles from "../styles";
 import tableStyles from "./TablesManager.module.css";
 
-const API_URL = "http://localhost:5000/api/tables";
+const API_URL = "https://resta-project-2.onrender.com/api/tables";
 
 const TablesManager = () => {
   const [tables, setTables] = useState([]);
@@ -102,10 +102,8 @@ const TablesManager = () => {
             padding: "8px 16px",
             borderRadius: 8,
             border: "1.5px solid #d6dbd8",
-            
           }}
         />
-      
       </div>
       <h2 style={{ ...styles.sectionTitle, marginBottom: 30 }}>Tables</h2>
 
@@ -126,7 +124,6 @@ const TablesManager = () => {
       )}
 
       {/* Search & Filter */}
-      
 
       {loading ? (
         <div style={{ textAlign: "center", padding: "40px 0" }}>

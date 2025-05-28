@@ -10,7 +10,9 @@ const ChefTable = () => {
 
   const fetchChefStats = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/orders/");
+      const response = await fetch(
+        "https://resta-project-2.onrender.com/api/orders/"
+      );
       if (!response.ok) {
         throw new Error("Failed to fetch orders");
       }

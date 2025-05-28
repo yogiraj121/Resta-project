@@ -17,7 +17,7 @@ const foods = [
     name: "Capricciosa",
     price: 200,
     time: "15 min",
-    img: "https://images.pexels.com/photos/1437267/pexels-photo-1437267.jpeg",
+    img: "https://cdn.pixabay.com/photo/2023/05/28/14/13/ai-generated-8023787_1280.jpg",
     category: "Pizza",
   },
   {
@@ -30,10 +30,10 @@ const foods = [
   },
   {
     _id: "food-3",
-    name: "Marinara",
+    name: "Marinara Pizza",
     price: 90,
     time: "10 min",
-    img: "https://images.pexels.com/photos/70497/pexels-photo-70497.jpeg",
+    img: "https://cdn.pixabay.com/photo/2017/12/10/14/47/pizza-3010062_1280.jpg",
     category: "Pizza",
   },
   {
@@ -49,7 +49,7 @@ const foods = [
     name: "Classic Burger",
     price: 250,
     time: "10 min",
-    img: "https://via.placeholder.com/150",
+    img: "https://cdn.pixabay.com/photo/2022/07/15/18/12/cheese-burger-7323672_1280.jpg",
     category: "Burger",
   },
   {
@@ -57,7 +57,7 @@ const foods = [
     name: "Cheese Burger",
     price: 280,
     time: "12 min",
-    img: "https://via.placeholder.com/150",
+    img: "https://cdn.pixabay.com/photo/2022/07/15/18/17/spicy-burger-7323694_1280.jpg",
     category: "Burger",
   },
   {
@@ -65,7 +65,7 @@ const foods = [
     name: "Cola",
     price: 50,
     time: "2 min",
-    img: "https://via.placeholder.com/150",
+    img: "https://cdn.pixabay.com/photo/2020/02/07/14/07/coca-cola-4827248_1280.jpg",
     category: "Drink",
   },
   {
@@ -73,7 +73,7 @@ const foods = [
     name: "Orange Juice",
     price: 60,
     time: "3 min",
-    img: "https://via.placeholder.com/150",
+    img: "https://cdn.pixabay.com/photo/2022/12/15/20/24/drinks-7658475_1280.jpg",
     category: "Drink",
   },
   {
@@ -81,7 +81,7 @@ const foods = [
     name: "Large Fries",
     price: 100,
     time: "8 min",
-    img: "https://via.placeholder.com/150",
+    img: "https://cdn.pixabay.com/photo/2024/01/23/08/11/ai-generated-8527044_1280.jpg",
     category: "French fries",
   },
   {
@@ -89,7 +89,7 @@ const foods = [
     name: "Small Fries",
     price: 70,
     time: "6 min",
-    img: "https://via.placeholder.com/150",
+    img: "https://cdn.pixabay.com/photo/2019/11/04/12/26/fries-4601057_1280.jpg",
     category: "French fries",
   },
   {
@@ -97,7 +97,7 @@ const foods = [
     name: "Garden Salad",
     price: 120,
     time: "5 min",
-    img: "https://via.placeholder.com/150",
+    img: "https://cdn.pixabay.com/photo/2016/08/09/10/30/tomatoes-1580273_1280.jpg",
     category: "Veggies",
   },
   {
@@ -105,7 +105,7 @@ const foods = [
     name: "Caesar Salad",
     price: 150,
     time: "7 min",
-    img: "https://via.placeholder.com/150",
+    img: "https://cdn.pixabay.com/photo/2017/08/11/00/32/salad-2629262_1280.jpg",
     category: "Veggies",
   },
 ];
