@@ -52,9 +52,6 @@ const OrderSchema = new mongoose.Schema({
   orderTime: { type: Date, default: Date.now }, // Timestamp for the order
 });
 
-// Create a compound index for orderNumber
-OrderSchema.index({ orderNumber: 1 }, { unique: true });
-
 const Order = mongoose.model("Order", OrderSchema);
 
 module.exports = Order;
