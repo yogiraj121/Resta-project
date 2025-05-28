@@ -24,8 +24,6 @@ const MobileCheckout = () => {
   const [startX, setStartX] = useState(0);
   const [currentX, setCurrentX] = useState(0);
   const [isSwipingMain, setIsSwipingMain] = useState(false);
-  const [isSwipingOrder, setIsSwipingOrder] = useState(false);
-  const [swipeTranslateX, setSwipeTranslateX] = useState(0); // State for button translation
 
   // Calculate totals - Keep these definitions here as they are used in the return statement
   const itemTotal = selectedItems.reduce(
@@ -122,7 +120,9 @@ const MobileCheckout = () => {
 
         if (diff > swipeThreshold) {
           // Swiped right - navigate back
-          navigate("/m");
+
+          handlePlaceOrder();
+          // Call place order function if needed
         }
       }
       // Reset swipe state
@@ -142,137 +142,80 @@ const MobileCheckout = () => {
     };
   }, [startX, currentX, isSwipingMain, navigate]); // Add dependencies
 
-  // Effect for swipe-to-order on the swipe button
-  useEffect(() => {
-    const button = swipeToOrderRef.current;
-    if (!button) return;
+  // Function to handle placing the order
+  const handlePlaceOrder = useCallback(async () => {
+    // Basic validation (can be expanded)
+    if (!userDetails.name || !userDetails.phone) {
+      alert("Please enter your name and phone number.");
+      setShowDetailsForm(true); // Show form when name/phone is missing
+      return;
+    }
 
-    // Function to handle placing the order - Defined inside useEffect
-    const handlePlaceOrder = async () => {
-      // Basic validation (can be expanded)
-      if (!userDetails.name || !userDetails.phone) {
-        alert("Please enter your name and phone number.");
-        return;
-      }
-      if (orderType === "Take Away" && !userDetails.address) {
-        alert("Please enter your address for Take Away orders.");
-        return;
-      }
+    // Only require address for Take Away orders
+    if (orderType === "Take Away" && !userDetails.address) {
+      alert("Please enter your delivery address for Take Away orders.");
+      setShowDetailsForm(true); // Show form when address is missing for Take Away
+      return;
+    }
 
-      const orderData = {
-        items: selectedItems.map((item) => ({
-          _id: item._id,
-          name: item.name,
-          price: item.price,
-          qty: item.qty,
-          time: item.time, // Include time
-          img: item.img, // Include image
-        })),
-        orderType,
-        userDetails,
-        cookingInstructions,
-        itemTotal,
-        deliveryCharge: orderType === "Take Away" ? deliveryCharge : undefined, // Only include if Take Away
-        taxes,
-        grandTotal,
-      };
-
-      try {
-        const response = await fetch("http://localhost:5000/api/orders/", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(orderData),
-        });
-
-        if (response.ok) {
-          const result = await response.json();
-          alert(
-            "Order placed successfully!\nAssigned Chef: " +
-              result.order.assignedChef
-          );
-          clearOrder(); // Clear the order after successful placement
-          navigate("/m"); // Navigate to mobile menu after successful order
-        } else {
-          const error = await response.json();
-          alert("Failed to place order: " + error.message);
-        }
-      } catch (error) {
-        console.error("Error placing order:", error);
-        alert("An error occurred while placing the order.");
-      }
+    const orderData = {
+      items: selectedItems.map((item) => ({
+        _id: item._id,
+        name: item.name,
+        price: item.price,
+        qty: item.qty,
+        time: item.time, // Include time
+        img: item.img, // Include image
+      })),
+      orderType,
+      userDetails: {
+        ...userDetails,
+        // Only include address if it's a Take Away order
+        address: orderType === "Take Away" ? userDetails.address : undefined,
+      },
+      cookingInstructions,
+      itemTotal,
+      deliveryCharge: orderType === "Take Away" ? deliveryCharge : undefined, // Only include if Take Away
+      taxes,
+      grandTotal,
     };
 
-    const handleTouchStart = (e) => {
-      setStartX(e.touches[0].clientX);
-      setCurrentX(e.touches[0].clientX);
-      setIsSwipingOrder(false); // Reset swipe state
-      setSwipeTranslateX(0); // Reset translation on touch start
-    };
+    try {
+      const response = await fetch("http://localhost:5000/api/orders/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(orderData),
+      });
 
-    const handleTouchMove = (e) => {
-      setCurrentX(e.touches[0].clientX);
-      const diff = currentX - startX;
-      // Only set isSwiping to true if horizontal movement is significant and not just a tap
-      if (Math.abs(diff) > 10) {
-        // Threshold to detect a swipe intention
-        setIsSwipingOrder(true);
-        // Update translation based on swipe distance, limit movement to the left
-        setSwipeTranslateX(Math.min(0, diff));
+      if (response.ok) {
+        const result = await response.json();
+        alert(
+          "Order placed successfully!\nAssigned Chef: " +
+            result.order.assignedChef
+        );
+        clearOrder(); // Clear the order after successful placement
+        navigate("/m"); // Navigate to mobile menu after successful order
+      } else {
+        const error = await response.json();
+        alert("Failed to place order: " + error.message);
       }
-      // Prevent default touchmove behavior for vertical scrolling only when swiping horizontally
-      const deltaY = Math.abs(
-        e.touches[0].clientY - e.changedTouches[0].clientY
-      );
-      if (Math.abs(diff) > deltaY) {
-        e.preventDefault();
-      }
-    };
-
-    const handleTouchEnd = () => {
-      if (isSwipingOrder) {
-        const diff = currentX - startX;
-        // Define a threshold for a successful left swipe (e.g., 50 pixels to the left)
-        const swipeThreshold = -50;
-
-        if (diff < swipeThreshold) {
-          // Swiped left - place order
-          handlePlaceOrder();
-        }
-      }
-      // Always reset translation on touch end
-      setSwipeTranslateX(0);
-      // Reset swipe state
-      setStartX(0);
-      setCurrentX(0);
-      setIsSwipingOrder(false);
-    };
-
-    button.addEventListener("touchstart", handleTouchStart);
-    button.addEventListener("touchmove", handleTouchMove);
-    button.addEventListener("touchend", handleTouchEnd);
-
-    return () => {
-      button.removeEventListener("touchstart", handleTouchStart);
-      button.removeEventListener("touchmove", handleTouchMove);
-      button.removeEventListener("touchend", handleTouchEnd);
-    };
+    } catch (error) {
+      console.error("Error placing order:", error);
+      alert("An error occurred while placing the order.");
+    }
   }, [
-    startX,
-    currentX,
-    isSwipingOrder,
     selectedItems,
     orderType,
     userDetails,
     cookingInstructions,
     itemTotal,
-    deliveryCharge,
     taxes,
     grandTotal,
     clearOrder,
     navigate,
-  ]); // Add dependencies
+  ]);
 
   return (
     <div
@@ -458,6 +401,28 @@ const MobileCheckout = () => {
                 />
               </div>
 
+              {/* Show address field only for Take Away orders */}
+              {orderType === "Take Away" && (
+                <div className={mobileCheckoutStyles.formField}>
+                  <label
+                    htmlFor="address"
+                    className={mobileCheckoutStyles.formLabel}
+                  >
+                    Delivery Address
+                  </label>
+                  <input
+                    type="text"
+                    id="address"
+                    name="address"
+                    placeholder="Enter your delivery address"
+                    value={userDetails.address}
+                    onChange={handleUserDetailsChange}
+                    className={mobileCheckoutStyles.formInput}
+                    required
+                  />
+                </div>
+              )}
+
               <button
                 onClick={handleSaveDetails}
                 className={mobileCheckoutStyles.saveDetailsButton}
@@ -466,33 +431,11 @@ const MobileCheckout = () => {
               </button>
             </div>
           )}
-        </div>
 
-        {/* Delivery Info */}
-        {orderType === "Take Away" && (
-          <div className={mobileCheckoutStyles.deliveryInfoSection}>
-            {showDetailsForm && (
-              <div className={mobileCheckoutStyles.deliveryAddressContainer}>
-                <label
-                  htmlFor="address"
-                  className={mobileCheckoutStyles.formLabel}
-                >
-                  Address
-                </label>
-                <input
-                  type="text"
-                  id="address"
-                  name="address"
-                  placeholder="Enter your address"
-                  value={userDetails.address}
-                  onChange={handleUserDetailsChange}
-                  className={mobileCheckoutStyles.formInput}
-                  required
-                />
-              </div>
-            )}
-
-            {!showDetailsForm && userDetails.address && (
+          {/* Remove the separate delivery address section since it's now part of the form */}
+          {orderType === "Take Away" &&
+            !showDetailsForm &&
+            userDetails.address && (
               <div className={mobileCheckoutStyles.deliveryAddressDisplay}>
                 <span className={mobileCheckoutStyles.deliveryIcon}>📍</span>
                 <span className={mobileCheckoutStyles.deliveryText}>
@@ -501,28 +444,23 @@ const MobileCheckout = () => {
               </div>
             )}
 
-            <div className={mobileCheckoutStyles.deliveryTimeContainer}>
-              <span className={mobileCheckoutStyles.deliveryIcon}>🟢</span>
-              <span className={mobileCheckoutStyles.deliveryText}>
-                Delivery in {totalPrepTime} mins
-              </span>
-            </div>
+          <div className={mobileCheckoutStyles.deliveryTimeContainer}>
+            <span className={mobileCheckoutStyles.deliveryIcon}>🟢</span>
+            <span className={mobileCheckoutStyles.deliveryText}>
+              {orderType === "Take Away" ? "Delivery" : "Ready"} in{" "}
+              {totalPrepTime} mins
+            </span>
           </div>
-        )}
+        </div>
       </div>
 
-      {/* Swipe to Order Button */}
+      {/* Swipe to Order Button - Now just a clickable button */}
       <div
         className={mobileCheckoutStyles.placeOrderButtonFixed}
-        ref={swipeToOrderRef} // Add ref here
+        // Add onClick handler
       >
-        <div
-          className={mobileCheckoutStyles.swipeToOrderContainer}
-          style={{
-            transform: `translateX(${swipeTranslateX}px)`,
-            transition: isSwipingOrder ? "none" : "transform 0.3s ease-out",
-          }} // Apply translation and transition
-        >
+        {/* Keeping the visual structure inside */}
+        <div className={mobileCheckoutStyles.swipeToOrderContainer}>
           <div className={mobileCheckoutStyles.swipeIconContainer}>
             <span className={mobileCheckoutStyles.swipeIcon}>→</span>
           </div>

@@ -2,6 +2,34 @@ const express = require("express");
 const router = express.Router();
 const Table = require("../models/Table");
 
+// Initialize tables (create default tables if none exist)
+router.post("/initialize", async (req, res) => {
+  try {
+    // Check if any tables exist
+    const tableCount = await Table.countDocuments();
+
+    if (tableCount === 0) {
+      // Create 10 default tables with 4 chairs each
+      const tables = Array.from({ length: 10 }, (_, i) => ({
+        number: i + 1,
+        chairs: 4,
+        occupiedChairs: 0,
+        status: "available",
+      }));
+
+      await Table.insertMany(tables);
+      res.status(201).json({ message: "Tables initialized successfully" });
+    } else {
+      res.status(200).json({ message: "Tables already exist" });
+    }
+  } catch (error) {
+    console.error("Error initializing tables:", error);
+    res
+      .status(500)
+      .json({ message: "Failed to initialize tables", error: error.message });
+  }
+});
+
 // Get all tables (with optional search/filter)
 router.get("/", async (req, res) => {
   try {
