@@ -73,17 +73,18 @@ const createOrder = async (req, res) => {
       });
     }
 
-    // User details might be optional or handled differently depending on Take Away vs Dine In
-    // Keeping the check for now, but consider if user details are strictly required for Take Away
+    // Validate user details
     if (
       !orderData.userDetails ||
       !orderData.userDetails.name ||
       !orderData.userDetails.phone
     ) {
-      // Relaxing this validation for now based on user feedback, assuming it's not strictly required for all order types
-      // return res.status(400).json({ message: "User details must include name and phone" });
+      return res
+        .status(400)
+        .json({ message: "User details must include name and phone" });
     }
 
+    // Validate totals
     if (
       typeof orderData.itemTotal !== "number" ||
       typeof orderData.taxes !== "number" ||
@@ -96,64 +97,49 @@ const createOrder = async (req, res) => {
     }
 
     let tableNumberForOrder = null;
-    let numberOfGuestsForOrder = orderData.numberOfGuests; // Use provided guest count if available
+    let numberOfGuestsForOrder = orderData.numberOfGuests || 1; // Default to 1 guest if not provided
 
-    // For Dine In orders, handle table assignment and guests
+    // For Dine In orders, handle table assignment
     if (orderData.orderType === "Dine In") {
-      numberOfGuestsForOrder = numberOfGuestsForOrder || 1; // Default guests to 1 if not provided
-
-      // If table number is not provided, find an available table
-      if (!orderData.tableNumber) {
-        const availableTable = await Table.findOne({
-          status: "available",
-          chairs: { $gte: numberOfGuestsForOrder }, // Table must have enough chairs
-        }).sort({ number: 1 }); // Get the lowest numbered available table
-
-        if (!availableTable) {
-          return res.status(400).json({
-            message: `No available tables for ${numberOfGuestsForOrder} guests`,
+      try {
+        // First check if any tables exist
+        const tableCount = await Table.countDocuments();
+        if (tableCount === 0) {
+          // Create a default table if none exist
+          const defaultTable = new Table({
+            number: 1,
+            chairs: 4,
+            occupiedChairs: 0,
+            status: "available",
           });
-        }
-
-        tableNumberForOrder = availableTable.number;
-
-        // Update the found table's occupied chairs and status
-        availableTable.occupiedChairs += numberOfGuestsForOrder;
-        if (availableTable.occupiedChairs >= availableTable.chairs) {
-          availableTable.status = "reserved"; // Set to reserved when full
+          await defaultTable.save();
+          tableNumberForOrder = 1;
         } else {
-          // Optionally set to 'occupied' or similar if needed when partially filled
-          // For now, keep as 'available' until full based on schema
-        }
-        await availableTable.save();
-      } else {
-        // If table number is provided, validate and update the specified table
-        const table = await Table.findOne({ number: orderData.tableNumber });
-        if (!table) {
-          return res.status(400).json({
-            message: `Table ${orderData.tableNumber} not found`,
-          });
-        }
+          // Find an available table
+          const availableTable = await Table.findOne({
+            status: "available",
+            chairs: { $gte: numberOfGuestsForOrder },
+          }).sort({ number: 1 });
 
-        // Check if table has enough available chairs
-        const availableChairs = table.chairs - table.occupiedChairs;
-        if (availableChairs < numberOfGuestsForOrder) {
-          return res.status(400).json({
-            message: `Table ${table.number} only has ${availableChairs} available chairs`,
-          });
-        }
+          if (!availableTable) {
+            return res.status(400).json({
+              message: `No available tables for ${numberOfGuestsForOrder} guests`,
+            });
+          }
 
-        // Update table's occupied chairs and status
-        table.occupiedChairs += numberOfGuestsForOrder;
-        if (table.occupiedChairs >= table.chairs) {
-          table.status = "reserved"; // Set to reserved when full
-        } else {
-          // Optionally set to 'occupied' or similar if needed when partially filled
-          // For now, keep as 'available' until full based on schema
+          tableNumberForOrder = availableTable.number;
+          availableTable.occupiedChairs += numberOfGuestsForOrder;
+          if (availableTable.occupiedChairs >= availableTable.chairs) {
+            availableTable.status = "reserved";
+          }
+          await availableTable.save();
         }
-        await table.save();
-
-        tableNumberForOrder = orderData.tableNumber;
+      } catch (tableError) {
+        console.error("Error handling table assignment:", tableError);
+        return res.status(500).json({
+          message: "Error assigning table",
+          error: tableError.message,
+        });
       }
     }
 
@@ -168,8 +154,7 @@ const createOrder = async (req, res) => {
       ...orderData,
       orderNumber,
       assignedChef,
-      status: "Pending", // Initial status
-      // Use the determined table number and guests
+      status: "Pending",
       ...(orderData.orderType === "Dine In" && {
         tableNumber: tableNumberForOrder,
         numberOfGuests: numberOfGuestsForOrder,
