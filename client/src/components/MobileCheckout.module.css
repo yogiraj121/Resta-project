@@ -1,0 +1,302 @@
+.mobileCheckoutContainer {
+  max-width: 430px;
+  margin: 0 auto;
+  background: #fff;
+  min-height: 100vh;
+  font-family: 'Inter', Arial, sans-serif;
+  padding-bottom: 120px; /* Add padding at the bottom for the fixed button */
+  box-sizing: border-box;
+}
+
+.headerSection {
+  padding: 28px 20px 0 20px;
+}
+
+.greetingText {
+  font-weight: 600;
+  font-size: 22px;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.placeOrderText {
+  font-weight: 400;
+  font-size: 15px;
+  color: #888;
+  margin-bottom: 20px;
+}
+
+.selectedItemsList {
+  margin-bottom: 30px;
+}
+
+.selectedItem {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #eee;
+}
+
+.itemImage {
+  width: 80px; /* Increased image size */
+  height: 80px; /* Increased image size */
+  border-radius: 10px;
+  object-fit: cover;
+  margin-right: 15px;
+}
+
+.itemDetails {
+  flex: 1;
+}
+
+.itemName {
+  font-weight: bold;
+  font-size: 16px;
+  margin-bottom: 5px;
+}
+
+.itemPrice {
+  font-size: 14px;
+  color: #333;
+  font-weight: bold;
+}
+
+.itemSize {
+  font-size: 12px;
+  color: #666;
+}
+
+.quantityControl {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-right: 10px; /* Added margin-right */
+}
+
+.quantityButton {
+  border: 1px solid #ccc; /* Added border */
+  background-color: #fff; /* Changed background */
+  color: #555;
+  border-radius: 5px;
+  padding: 5px; /* Adjusted padding */
+  cursor: pointer;
+  font-size: 16px; /* Adjusted font size */
+  width: 30px; /* Added width */
+  height: 30px; /* Added height */
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Center content */
+}
+
+.quantity {
+  font-size: 16px; /* Adjusted font size and weight */
+  font-weight: bold;
+}
+
+.removeItemButton {
+  border: none;
+  background: none;
+  color: #e57373;
+  font-size: 24px; /* Adjusted font size and removed padding */
+  cursor: pointer;
+  padding: 0;
+}
+
+.cookingInstructionsLink {
+  font-size: 14px;
+  color: #888;
+  border-bottom: 1px dashed #ccc;
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+  font-style: italic;
+  cursor: pointer; /* Indicate it's clickable */
+}
+
+.orderTypeToggle {
+  display: flex;
+  background: #f0f0f0;
+  border-radius: 25px;
+  padding: 3px;
+  margin-bottom: 30px;
+}
+
+.orderTypeButton {
+  flex: 1;
+  border: none;
+  background: none; /* Default background */
+  border-radius: 20px;
+  padding: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: none; /* Default shadow */
+  color: #888; /* Default text color */
+}
+
+.orderTypeButtonActive {
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  color: #333;
+}
+
+.orderSummary {
+  background: #fffbe5;
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 30px;
+}
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 15px;
+}
+
+.summaryTotal {
+  font-weight: bold;
+}
+
+.summaryDivider {
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #eee;
+  font-size: 15px;
+}
+
+.grandTotalRow {
+  display: flex;
+  justify-content: space-between;
+  font-weight: bold;
+  font-size: 20px;
+  margin-top: 10px;
+}
+
+.userDetailsSection {
+  margin-bottom: 30px;
+}
+
+.userDetailsTitle {
+  font-weight: bold;
+  font-size: 16px;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.userDetailsText {
+  cursor: pointer;
+  font-size: 14px;
+  color: #555;
+}
+
+.userDetailsTextPlaceholder {
+  margin: 5px 0;
+  color: #888;
+}
+
+.userDetailsForm {
+
+}
+
+.formField {
+  margin-bottom: 15px;
+}
+
+.formLabel {
+  font-size: 14px;
+  color: #555;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.formInput {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+}
+
+.saveDetailsButton {
+  margin-top: 15px;
+  padding: 10px 15px;
+  background: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.deliveryInfoSection {
+  margin-bottom: 30px;
+}
+
+.deliveryAddressContainer {
+  margin-bottom: 15px;
+}
+
+.deliveryAddressDisplay {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.deliveryIcon {
+  color: #4CAF50;
+  margin-right: 10px;
+  font-size: 20px;
+}
+
+.deliveryText {
+  color: #555;
+  font-size: 14px;
+}
+
+.deliveryTimeContainer {
+  display: flex;
+  align-items: center;
+}
+
+.placeOrderButtonFixed {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 10px 20px;
+  background: #fff;
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+  cursor: pointer; /* Indicate it's clickable */
+}
+
+.swipeToOrderContainer {
+  display: flex;
+  align-items: center;
+  background: #eee;
+  border-radius: 30px;
+  padding: 8px;
+  width: fit-content;
+  margin: 0 auto;
+}
+
+.swipeIconContainer {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #888;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 15px;
+}
+
+.swipeIcon {
+  color: white;
+  font-size: 20px;
+}
+
+.swipeText {
+  font-weight: bold;
+  font-size: 16px;
+  color: #555;
+} 

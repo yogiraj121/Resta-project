@@ -1,0 +1,42 @@
+.revenue-chart {
+  background: white;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.chart-container {
+  height: 300px;
+  margin-top: 20px;
+}
+
+/* Inherit card header styles from OrderSummary.css */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.card-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.card-subtitle {
+  font-size: 14px;
+  color: #666;
+  margin: 5px 0 0;
+}
+
+.period-selector {
+  font-size: 14px;
+  color: #666;
+  cursor: pointer;
+}
+
+.dropdown-arrow {
+  margin-left: 5px;
+} 

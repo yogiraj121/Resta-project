@@ -1,0 +1,236 @@
+.orderLineContainer {
+  display: flex;
+  height: 100vh;
+  background: #e8f2ec;
+}
+
+.mainContentArea {
+  flex: 1;
+  padding: 40px;
+}
+
+.sectionTitle {
+  margin-bottom: 30px;
+}
+
+.ordersGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 32px;
+  background: white;
+  border-radius: 32px;
+  padding: 40px;
+}
+
+.loadingContainer,
+.errorContainer {
+  display: flex;
+  height: 100vh;
+  background: #e8f2ec;
+  justify-content: center;
+  align-items: center;
+}
+
+.loadingText {
+  font-size: 20px;
+  color: #666;
+}
+
+.errorText {
+  font-size: 20px;
+  color: #ff4444;
+}
+
+.orderCard {
+  border-radius: 18px;
+  min-height: 340px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.orderCardHeader {
+  border-radius: 16px 16px 0 0;
+  padding: 16px 18px 10px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #ffffff;
+  margin: 5px;
+}
+
+.orderCardHeaderContent {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.orderCardHeaderIcon {
+  font-size: 22px;
+}
+
+.orderCardHeaderText {
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.orderCardStatus {
+  text-align: center;
+  font-weight: 600;
+  font-size: 15px;
+  background-color: #edfff2;
+  border-radius: 16px;
+  padding: 10px;
+}
+
+.orderCardTime {
+  font-size: 11px;
+  margin-top: 2px;
+  margin-left: 2px;
+  color: #000;
+}
+
+.orderCardInfo {
+  padding: 12px 18px 0 18px;
+  font-size: 15px;
+  color: #222;
+}
+
+.orderCardInfoTitle {
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.orderCardInfoSubtitle {
+  margin-left: 12px;
+  color: #888;
+  font-weight: 400;
+  font-size: 14px;
+}
+
+.orderCardInfoText {
+  color: #888;
+  font-size: 14px;
+  margin-bottom: 2px;
+}
+
+.orderCardItems {
+  background: white;
+  border-radius: 12px;
+  margin: 12px 18px 0 18px;
+  padding: 12px 16px;
+  font-size: 15px;
+  color: #222;
+  min-height: 80px;
+}
+
+.orderCardItemNote {
+  font-size: 13px;
+  color: #666;
+  margin-left: 20px;
+}
+
+.orderCardItemInstructions {
+  font-size: 13px;
+  color: #666;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #eee;
+}
+
+.orderCardFooter {
+  flex: 1;
+}
+
+.orderCardFooterContent {
+  padding-bottom: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.orderCardButton {
+  border-radius: 8px;
+  padding: 6px 18px;
+  font-weight: 600;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  border: none;
+}
+
+/* Status-specific styles */
+.dineInPending {
+  background: #fff7ed;
+  border: 2.5px solid #ffe3b8;
+}
+
+.dineInPending .orderCardHeader  {
+  background: #ffffff;
+}
+
+.dineInPending .orderCardButton {
+  background: #ffb84c;
+  color: #b88300;
+}
+.dineInPending .orderCardStatus {
+  background: #ffb84c;
+}
+
+.dineInServed {
+  background: #B9F8C9;
+  border: 2.5px solid #b8ffc7;
+}
+
+.dineInServed .orderCardHeader {
+  background: #ffffff;
+}
+
+.dineInServed .orderCardButton {
+  background: #31FF65;
+  color: #0E912F;
+}
+
+.dineInServed .orderCardStatus {
+  background: #31FF65;
+}
+
+.takeAwayNotPicked {
+  background: #f5f5f5;
+  border: 2.5px solid #e0e0e0;
+}
+
+.takeAwayNotPicked .orderCardHeader {
+  background: #e0e0e0;
+}
+
+.takeAwayNotPicked .orderCardButton {
+  background: #9e9e9e;
+  color: #616161;
+}
+
+.takeAwayNotPicked .orderCardStatus {
+  background: #9e9e9e;
+}
+
+
+.takeAwayCompleted {
+  background: #f5f5f5;
+  border: 2.5px solid #e0e0e0;
+}
+
+.takeAwayCompleted .orderCardHeader {
+  background: #e0e0e0;
+}
+
+.takeAwayCompleted .orderCardButton {
+  background: #9e9e9e;
+  color: #616161;
+} 
+
+.takeAwayCompleted .orderCardStatus {
+  background: #9e9e9e;
+}

@@ -1,0 +1,137 @@
+.order-summary {
+  background: white;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.card-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.card-subtitle {
+  font-size: 14px;
+  color: #666;
+  margin: 5px 0 0;
+}
+
+.period-selector {
+  font-size: 14px;
+  color: #666;
+  cursor: pointer;
+  padding: 8px 15px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  position: relative;
+}
+
+.dropdown-arrow {
+  margin-left: 5px;
+}
+
+.period-dropdown {
+  position: absolute;
+  top: 35px;
+  right: 0;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  z-index: 1;
+  min-width: 100px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.period-dropdown div {
+  padding: 8px 15px;
+  cursor: pointer;
+}
+
+.period-dropdown div:hover {
+  background-color: #f0f0f0;
+}
+
+.order-numbers {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.order-number {
+  text-align: center;
+  background-color: #fff;
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid #eee;
+}
+
+.order-value {
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 5px;
+}
+
+.order-type {
+  font-size: 14px;
+  color: #666;
+}
+
+.donut-chart-container {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
+.donut-chart {
+  width: 150px;
+  height: 150px;
+  position: relative;
+}
+
+.donut-center-text {
+  font-size: 20px;
+  font-weight: 600;
+  fill: #333;
+}
+
+.donut-legend {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+
+.legend-text {
+  flex: 1;
+  font-size: 14px;
+  color: #666;
+}
+
+.legend-percent {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+} 
