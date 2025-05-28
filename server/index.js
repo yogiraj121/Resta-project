@@ -11,11 +11,7 @@ app.use(express.json());
 
 // MongoDB connection
 mongoose.connect(
-  process.env.MONGO || "mongodb://localhost:27017/restaurant-pos",
-  {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  }
+  process.env.MONGO
 );
 
 const db = mongoose.connection;

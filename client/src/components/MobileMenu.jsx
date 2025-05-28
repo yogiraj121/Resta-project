@@ -120,6 +120,8 @@ const MobileMenu = () => {
     const isSelected = selectedItems.some((item) => item._id === food._id);
     if (isSelected) {
       removeItemFromOrder(food._id);
+    } else {
+      addItemToOrder(food);
     }
   };
 

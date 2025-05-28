@@ -8,8 +8,7 @@ import MobileMenu from "./components/MobileMenu";
 import MobileCheckout from "./components/MobileCheckout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Dashboard from "./components/Dashboard";
-
-
+import { OrderProvider } from "./context/OrderContext";
 
 const MOBILE_BREAKPOINT = 768; // Define your mobile breakpoint
 
@@ -34,7 +33,6 @@ function AppRoutes() {
     return (
       <Routes>
         <Route path="/" element={<MobileMenu />} />
-
 
         {/* Keep /m route for compatibility if needed */}
         <Route
@@ -79,7 +77,11 @@ function AppRoutes() {
 }
 
 const App = () => {
-  return <AppRoutes />;
+  return (
+    <OrderProvider>
+      <AppRoutes />
+    </OrderProvider>
+  );
 };
 
 export default App;
