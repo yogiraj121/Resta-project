@@ -11,7 +11,7 @@ app.use(express.json());
 
 // MongoDB connection
 mongoose.connect(
-  process.env.MONGO_URI || "mongodb://localhost:27017/restaurant-pos",
+  process.env.MONGO || "mongodb://localhost:27017/restaurant-pos",
   {
     useNewUrlParser: true,
     useUnifiedTopology: true,
