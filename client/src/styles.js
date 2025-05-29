@@ -44,7 +44,6 @@ const styles = {
     backgroundColor: "#e8f2ec",
     borderRadius: "10px",
     color: "#4CAF50",
-    padding: "8px",
   },
   bottomCircle: {
     width: "40px",
