@@ -3,7 +3,7 @@ import axios from "axios";
 import styles from "../styles";
 
 // Use the correct API URLs
-const API_URL = "http://localhost:5000/api";
+const API_URL = "https://resta-project-2.onrender.com/api";
 const TABLES_URL = `${API_URL}/tables`;
 const ORDERS_URL = `${API_URL}/orders`;
 

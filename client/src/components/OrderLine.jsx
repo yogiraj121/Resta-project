@@ -208,8 +208,14 @@ const OrderLine = () => {
                         <>
                           <div>Dine In</div>
                           <div className={orderLineStyles.orderCardTime}>
-                            Ongoing:{minutes}:
-                            {seconds.toString().padStart(2, "0")}
+                            {getRemainingTime(order) > 0 ? (
+                              <>
+                                Time Left: {minutes}:
+                                {seconds.toString().padStart(2, "0")}
+                              </>
+                            ) : (
+                              <>Ready to Serve</>
+                            )}
                           </div>
                         </>
                       )}
@@ -229,7 +235,10 @@ const OrderLine = () => {
                           <div>Take Away</div>
                           <div className={orderLineStyles.orderCardTime}>
                             {getRemainingTime(order) > 0 ? (
-                              <>Ongoing: {getOngoingTime(order).display}</>
+                              <>
+                                Time Left: {minutes}:
+                                {seconds.toString().padStart(2, "0")}
+                              </>
                             ) : (
                               <select
                                 value={

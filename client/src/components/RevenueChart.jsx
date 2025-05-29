@@ -20,7 +20,7 @@ const RevenueChart = () => {
     try {
       console.log("Fetching revenue data for period:", period);
       const response = await fetch(
-        `http://localhost:5000/api/orders/revenue?period=${period}`
+        `https://resta-project-2.onrender.com/api/orders/revenue?period=${period}`
       );
 
       if (!response.ok) {
