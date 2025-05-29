@@ -220,6 +220,35 @@ const updateOrderStatus = async (req, res) => {
       return res.status(404).json({ message: "Order not found" });
     }
 
+    // If the order is served or completed and it's a dine-in order, update the table status
+    if (
+      (status === "Served" || status === "Completed") &&
+      order.orderType === "Dine In"
+    ) {
+      try {
+        // Find the table by number
+        const table = await Table.findOne({ number: order.tableNumber });
+        if (table) {
+          // Update table status and reset chairs
+          table.status = "available";
+          table.occupiedChairs = 0;
+          await table.save();
+
+          // Log the table update for debugging
+          console.log(
+            `Table ${table.number} updated: status=${table.status}, occupiedChairs=${table.occupiedChairs}`
+          );
+        } else {
+          console.log(
+            `Table ${order.tableNumber} not found for order ${order._id}`
+          );
+        }
+      } catch (tableError) {
+        console.error("Error updating table status:", tableError);
+        // Don't fail the order update if table update fails
+      }
+    }
+
     // Return the updated order
     res.status(200).json(order);
   } catch (error) {
@@ -231,4 +260,148 @@ const updateOrderStatus = async (req, res) => {
   }
 };
 
-module.exports = { createOrder, getOrders, updateOrderStatus };
+// Get completed orders
+const getCompletedOrders = async (req, res) => {
+  try {
+    const orders = await Order.find({
+      status: "Served",
+      orderType: "Dine In",
+    }).sort({ orderTime: -1 });
+
+    res.status(200).json(orders);
+  } catch (error) {
+    console.error("Error fetching completed orders:", error);
+    res.status(500).json({
+      message: "Failed to fetch completed orders",
+      error: error.message,
+    });
+  }
+};
+
+// Get revenue data by period
+const getRevenueData = async (req, res) => {
+  try {
+    const { period } = req.query;
+    const now = new Date();
+    let startDate;
+
+    // Calculate start date based on period
+    if (period === "Daily") {
+      startDate = new Date(now);
+      startDate.setDate(now.getDate() - 6); // Last 7 days
+    } else if (period === "Weekly") {
+      startDate = new Date(now);
+      startDate.setDate(now.getDate() - 6 * 7); // Last 7 weeks
+    } else if (period === "Monthly") {
+      startDate = new Date(now);
+      startDate.setMonth(now.getMonth() - 6); // Last 7 months
+    } else {
+      return res.status(400).json({ message: "Invalid period" });
+    }
+
+    // Set start date to beginning of day
+    startDate.setHours(0, 0, 0, 0);
+
+    // Get orders within the date range
+    const orders = await Order.find({
+      orderTime: { $gte: startDate },
+      status: { $in: ["Served", "Completed"] },
+    }).sort({ orderTime: 1 });
+
+    // Initialize data structure based on period
+    let revenueData = [];
+    let labels = [];
+
+    if (period === "Daily") {
+      // Create array for last 7 days
+      for (let i = 0; i < 7; i++) {
+        const date = new Date(now);
+        date.setDate(now.getDate() - (6 - i));
+        date.setHours(0, 0, 0, 0);
+        revenueData.push({
+          date: date,
+          total: 0,
+        });
+        labels.push(
+          ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][date.getDay()]
+        );
+      }
+    } else if (period === "Weekly") {
+      // Create array for last 7 weeks
+      for (let i = 0; i < 7; i++) {
+        const date = new Date(now);
+        date.setDate(now.getDate() - (6 - i) * 7);
+        date.setHours(0, 0, 0, 0);
+        revenueData.push({
+          date: date,
+          total: 0,
+        });
+        labels.push(`Week ${i + 1}`);
+      }
+    } else if (period === "Monthly") {
+      // Create array for last 7 months
+      for (let i = 0; i < 7; i++) {
+        const date = new Date(now);
+        date.setMonth(now.getMonth() - (6 - i));
+        date.setDate(1);
+        date.setHours(0, 0, 0, 0);
+        revenueData.push({
+          date: date,
+          total: 0,
+        });
+        labels.push(date.toLocaleString("default", { month: "short" }));
+      }
+    }
+
+    // Aggregate revenue data
+    orders.forEach((order) => {
+      const orderDate = new Date(order.orderTime);
+      orderDate.setHours(0, 0, 0, 0);
+
+      if (period === "Daily") {
+        const dayIndex = Math.floor(
+          (orderDate - startDate) / (1000 * 60 * 60 * 24)
+        );
+        if (dayIndex >= 0 && dayIndex < 7) {
+          revenueData[dayIndex].total += order.grandTotal;
+        }
+      } else if (period === "Weekly") {
+        const weekIndex = Math.floor(
+          (orderDate - startDate) / (1000 * 60 * 60 * 24 * 7)
+        );
+        if (weekIndex >= 0 && weekIndex < 7) {
+          revenueData[weekIndex].total += order.grandTotal;
+        }
+      } else if (period === "Monthly") {
+        const monthIndex =
+          (orderDate.getMonth() - startDate.getMonth() + 12) % 12;
+        if (monthIndex >= 0 && monthIndex < 7) {
+          revenueData[monthIndex].total += order.grandTotal;
+        }
+      }
+    });
+
+    // Calculate total revenue
+    const totalRevenue = revenueData.reduce((sum, data) => sum + data.total, 0);
+
+    res.status(200).json({
+      labels,
+      data: revenueData.map((d) => d.total),
+      total: totalRevenue,
+    });
+  } catch (error) {
+    console.error("Error fetching revenue data:", error);
+    res.status(500).json({
+      message: "Failed to fetch revenue data",
+      error: error.message,
+    });
+  }
+};
+
+module.exports = {
+  createOrder,
+  getOrders,
+  updateOrderStatus,
+  getCompletedOrders,
+  getRevenueData,
+};

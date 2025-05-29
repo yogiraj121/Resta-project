@@ -6,6 +6,7 @@ const OrderLine = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [pickupStatus, setPickupStatus] = useState({});
 
   const fetchOrders = async () => {
     try {
@@ -140,6 +141,18 @@ const OrderLine = () => {
     return () => clearInterval(interval);
   }, []);
 
+  const handlePickupStatusChange = async (orderId, status) => {
+    try {
+      setPickupStatus((prev) => ({ ...prev, [orderId]: status }));
+
+      if (status === "Picked Up") {
+        await updateOrderStatus(orderId, "Completed");
+      }
+    } catch (err) {
+      console.error("Error updating pickup status:", err);
+    }
+  };
+
   if (loading) {
     return (
       <div className={orderLineStyles.loadingContainer}>
@@ -162,15 +175,6 @@ const OrderLine = () => {
         <h2 style={{ ...styles.sectionTitle, marginBottom: 30 }}>Order Line</h2>
         <div className={orderLineStyles.ordersGrid}>
           {orders.map((order, index) => {
-            // Determine visual status based on actual status and remaining time
-            const visualStatus =
-              (order.status === "Pending" || order.status === "Preparing") &&
-              getRemainingTime(order) <= 0 // Use <= 0 to be safe with potential small negative results
-                ? order.orderType === "Dine In"
-                  ? "Served"
-                  : "Completed" // Visually treat as Served/Completed if timer is done but status is Pending/Preparing
-                : order.status; // Otherwise, use the actual status
-
             const remainingTime = getRemainingTime(order);
             const minutes = remainingTime ? Math.floor(remainingTime / 60) : 0;
             const seconds = remainingTime ? remainingTime % 60 : 0;
@@ -224,7 +228,27 @@ const OrderLine = () => {
                         <>
                           <div>Take Away</div>
                           <div className={orderLineStyles.orderCardTime}>
-                            Not Picked up
+                            {getRemainingTime(order) > 0 ? (
+                              <>Ongoing: {getOngoingTime(order).display}</>
+                            ) : (
+                              <select
+                                value={
+                                  pickupStatus[order._id] || "Not Picked Up"
+                                }
+                                onChange={(e) =>
+                                  handlePickupStatusChange(
+                                    order._id,
+                                    e.target.value
+                                  )
+                                }
+                                className={orderLineStyles.pickupSelect}
+                              >
+                                <option value="Not Picked Up">
+                                  Not Picked Up
+                                </option>
+                                <option value="Picked Up">Picked Up</option>
+                              </select>
+                            )}
                           </div>
                         </>
                       )}
@@ -278,18 +302,15 @@ const OrderLine = () => {
                 {/* Footer */}
                 <div className={orderLineStyles.orderCardFooter} />
                 <div className={orderLineStyles.orderCardFooterContent}>
-                  {/* Processing Button (Pending Visual Status - Only for Dine In) */}
-                  {visualStatus === "Pending" &&
-                    order.orderType === "Dine In" && (
-                      <div className={orderLineStyles.orderCardButton}>
-                        Processing ⏳
-                      </div>
-                    )}
+                  {/* Processing Button (Only show when order is still being prepared) */}
+                  {getRemainingTime(order) > 0 && (
+                    <div className={orderLineStyles.orderCardButton}>
+                      Processing ⏳
+                    </div>
+                  )}
 
-                  {/* Order Done Button (Appears for all other states) */}
-                  {!(
-                    visualStatus === "Pending" && order.orderType === "Dine In"
-                  ) && (
+                  {/* Order Done Button (Show when preparation time is complete) */}
+                  {getRemainingTime(order) <= 0 && (
                     <div className={orderLineStyles.orderCardButton}>
                       Order Done {order.orderType === "Take Away" ? "✅" : "✅"}
                     </div>

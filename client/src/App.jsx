@@ -9,6 +9,8 @@ import MobileCheckout from "./components/MobileCheckout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Dashboard from "./components/Dashboard";
 import { OrderProvider } from "./context/OrderContext";
+import RevenueChart from "./components/RevenueChart";
+import MobileMenuMobile from "./MobileMenu";
 
 const MOBILE_BREAKPOINT = 768; // Define your mobile breakpoint
 
@@ -59,6 +61,8 @@ function AppRoutes() {
             <Route path="/orders" element={<OrderLine />} />
             {/* Redirect /m and /checkout on desktop if accessed directly */}
             <Route path="/m" element={<Dashboard />} />
+            <Route path="/revenue" element={<RevenueChart />} />
+            <Route path="/menu" element={<MobileMenuMobile />} />
             <Route
               path="/checkout"
               element={

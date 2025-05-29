@@ -12,6 +12,8 @@ const OrderSummary = () => {
 
   useEffect(() => {
     fetchOrderStats(selectedPeriod);
+    const interval = setInterval(() => fetchOrderStats(selectedPeriod), 30000);
+    return () => clearInterval(interval);
   }, [selectedPeriod]);
 
   const fetchOrderStats = async (period) => {

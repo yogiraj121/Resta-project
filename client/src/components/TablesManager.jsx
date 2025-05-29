@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import styles from "../styles";
-import tableStyles from "./TablesManager.module.css";
 
-const API_URL = "https://resta-project-2.onrender.com/api/tables";
+// Use the correct API URLs
+const API_URL = "http://localhost:5000/api";
+const TABLES_URL = `${API_URL}/tables`;
+const ORDERS_URL = `${API_URL}/orders`;
 
 const TablesManager = () => {
   const [tables, setTables] = useState([]);
@@ -12,26 +14,100 @@ const TablesManager = () => {
   const [showAdd, setShowAdd] = useState(false);
   const [newChairs, setNewChairs] = useState(3);
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
   const [actionLoading, setActionLoading] = useState(false);
   const [actionError, setActionError] = useState("");
 
   // Fetch tables from API
   const fetchTables = async () => {
-    setLoading(true);
-    setError("");
     try {
-      const res = await axios.get(API_URL);
-      setTables(res.data);
+      const response = await axios.get(TABLES_URL);
+      setTables(response.data);
+      setError("");
     } catch (err) {
+      console.error("Error fetching tables:", err);
       setError(err.response?.data?.error || "Failed to load tables");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
+  // Update table status and reset chairs
+  const updateTableStatus = async (tableNumber) => {
+    try {
+      // Find the table by number
+      const table = tables.find((t) => t.number === tableNumber);
+      if (!table) {
+        console.log(`Table ${tableNumber} not found in local state`);
+        return;
+      }
+
+      // Update the table status using the table number
+      const response = await axios.put(`${TABLES_URL}/number/${tableNumber}`, {
+        status: "available",
+        occupiedChairs: 0,
+      });
+
+      // Update local state immediately
+      setTables((prevTables) =>
+        prevTables.map((t) =>
+          t.number === tableNumber
+            ? { ...t, status: "available", occupiedChairs: 0 }
+            : t
+        )
+      );
+
+      console.log(`Table ${tableNumber} updated successfully`);
+      return response.data;
+    } catch (err) {
+      console.error(`Error updating table ${tableNumber}:`, err);
+      throw err;
+    }
+  };
+
+  // Check for completed orders and update table status
+  const checkCompletedOrders = async () => {
+    try {
+      // Get all orders
+      const response = await axios.get(ORDERS_URL);
+      const orders = response.data;
+
+      // Filter for served or completed dine-in orders
+      const completedOrders = orders.filter(
+        (order) =>
+          (order.status === "Served" || order.status === "Completed") &&
+          order.orderType === "Dine In"
+      );
+
+      console.log(`Found ${completedOrders.length} completed orders`);
+
+      // Update tables based on completed orders
+      for (const order of completedOrders) {
+        if (order.tableNumber) {
+          try {
+            await updateTableStatus(order.tableNumber);
+          } catch (err) {
+            console.error(`Error updating table ${order.tableNumber}:`, err);
+            // Continue with next order even if one fails
+            continue;
+          }
+        }
+      }
+    } catch (err) {
+      console.error("Error checking completed orders:", err);
+    }
+  };
+
+  // Initial fetch and setup polling
   useEffect(() => {
     fetchTables();
-  }, []);
+
+    // Set up polling for completed orders
+    const interval = setInterval(() => {
+      checkCompletedOrders();
+    }, 3000); // Check every 3 seconds
+
+    return () => clearInterval(interval);
+  }, []); // Remove tables dependency to prevent infinite loop
 
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this table?")) return;
@@ -39,9 +115,8 @@ const TablesManager = () => {
     setActionLoading(true);
     setActionError("");
     try {
-      await axios.delete(`${API_URL}/${id}`);
-      // Assuming backend handles renumbering and returns the updated list or triggers a re-fetch
-      fetchTables(); // Re-fetch tables to get updated list and numbering
+      await axios.delete(`${TABLES_URL}/${id}`);
+      fetchTables();
     } catch (err) {
       setActionError(err.response?.data?.error || "Failed to delete table");
     }
@@ -57,14 +132,12 @@ const TablesManager = () => {
     setActionLoading(true);
     setActionError("");
     try {
-      const res = await axios.post(API_URL, {
-        // Number is handled by backend for sequential order after creation/deletion
-        name: "Table", // Default name is "Table"
+      await axios.post(TABLES_URL, {
+        name: "Table",
         chairs: newChairs,
-        status: "available", // New tables are initially available
+        status: "available",
       });
-      // Assuming backend handles renumbering and returns the updated list or triggers a re-fetch
-      fetchTables(); // Re-fetch tables to get updated list and numbering
+      fetchTables();
       setShowAdd(false);
       setNewChairs(3);
     } catch (err) {
@@ -79,8 +152,7 @@ const TablesManager = () => {
       !search ||
       t.number.toString().includes(search) ||
       (t.name && t.name.toLowerCase().includes(search.toLowerCase()));
-    const matchesStatus = !statusFilter || t.status === statusFilter;
-    return matchesSearch && matchesStatus;
+    return matchesSearch;
   });
 
   return (
@@ -157,7 +229,7 @@ const TablesManager = () => {
             <div
               key={table._id}
               style={{
-                background: table.status === "reserved" ? "#4CAF50" : "#f3f6f4", // Use status for background color
+                background: table.status === "reserved" ? "#4CAF50" : "#f3f6f4",
                 border: "1.5px solid #d6dbd8",
                 borderRadius: 12,
                 padding: 0,
@@ -169,11 +241,11 @@ const TablesManager = () => {
                 justifyContent: "flex-start",
                 fontSize: 20,
                 fontWeight: 500,
-                color: table.status === "reserved" ? "white" : "#222", // Use status for text color
+                color: table.status === "reserved" ? "white" : "#222",
               }}
             >
-              {/* Removed Edit button */}
-              {table.status !== "reserved" && (
+              {/* Show delete button only when table is empty (no occupied chairs) */}
+              {table.occupiedChairs === 0 && (
                 <span
                   style={{
                     position: "absolute",
@@ -181,7 +253,7 @@ const TablesManager = () => {
                     right: 10,
                     cursor: "pointer",
                     fontSize: 18,
-                    color: table.status === "reserved" ? "white" : "#444", // Use status for icon color
+                    color: table.status === "reserved" ? "white" : "#444",
                     opacity: 0.7,
                   }}
                   title="Delete"
@@ -194,7 +266,7 @@ const TablesManager = () => {
                 style={{
                   padding: "18px 0 0 18px",
                   fontSize: 18,
-                  color: table.status === "reserved" ? "white" : "#222", // Use status for text color
+                  color: table.status === "reserved" ? "white" : "#222",
                 }}
               >
                 {table.name || "Table"}
@@ -204,7 +276,7 @@ const TablesManager = () => {
                   padding: "0 0 0 18px",
                   fontSize: 28,
                   fontWeight: 700,
-                  color: table.status === "reserved" ? "white" : "#222", // Use status for text color
+                  color: table.status === "reserved" ? "white" : "#222",
                 }}
               >
                 {String(table.number).padStart(2, "0")}
@@ -215,7 +287,7 @@ const TablesManager = () => {
                   bottom: 10,
                   right: 14,
                   fontSize: 14,
-                  color: table.status === "reserved" ? "white" : "#444", // Use status for text color
+                  color: table.status === "reserved" ? "white" : "#444",
                   opacity: 0.7,
                 }}
               >
@@ -235,7 +307,7 @@ const TablesManager = () => {
                       ? "#fff"
                       : table.status === "reserved"
                       ? "#c00"
-                      : "#388e3c", // Simplified status color logic
+                      : "#388e3c",
                   fontWeight: 600,
                 }}
               >

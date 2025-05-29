@@ -11,6 +11,8 @@ const StatsCards = () => {
 
   useEffect(() => {
     fetchStats();
+    const interval = setInterval(fetchStats, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   const fetchStats = async () => {
@@ -41,7 +43,7 @@ const StatsCards = () => {
         totalChefs: 4, // Fixed number of chefs
         totalRevenue,
         totalOrders: orders.length,
-        totalClients: uniqueClients.size,
+        totalClients: uniqueClients.size, // Count of unique phone numbers
       });
     } catch (error) {
       console.error("Error fetching stats:", error);

@@ -44,6 +44,17 @@ router.get("/", async (req, res) => {
   }
 });
 
+// Get table by number
+router.get("/number/:number", async (req, res) => {
+  try {
+    const table = await Table.findOne({ number: Number(req.params.number) });
+    if (!table) return res.status(404).json({ error: "Table not found" });
+    res.json(table);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Get table by ID
 router.get("/:id", async (req, res) => {
   try {
@@ -78,7 +89,33 @@ router.post("/", async (req, res) => {
   }
 });
 
-// Update table
+// Update table by number
+router.put("/number/:number", async (req, res) => {
+  try {
+    const tableNumber = parseInt(req.params.number);
+    const updateData = req.body;
+
+    // Find the table by number
+    const table = await Table.findOne({ number: tableNumber });
+    if (!table) {
+      return res.status(404).json({ error: `Table ${tableNumber} not found` });
+    }
+
+    // Update table fields
+    if (updateData.status !== undefined) table.status = updateData.status;
+    if (updateData.occupiedChairs !== undefined) {
+      table.occupiedChairs = updateData.occupiedChairs;
+    }
+
+    await table.save();
+    res.json(table);
+  } catch (err) {
+    console.error("Error updating table:", err);
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// Update table by ID
 router.put("/:id", async (req, res) => {
   try {
     const updateData = req.body;
@@ -90,19 +127,9 @@ router.put("/:id", async (req, res) => {
     if (updateData.number !== undefined) table.number = updateData.number;
     if (updateData.name !== undefined) table.name = updateData.name;
     if (updateData.chairs !== undefined) table.chairs = updateData.chairs;
-    if (updateData.status !== undefined) table.status = updateData.status; // Allow explicit status update
+    if (updateData.status !== undefined) table.status = updateData.status;
     if (updateData.occupiedChairs !== undefined) {
       table.occupiedChairs = updateData.occupiedChairs;
-
-      // Automatically update status based on occupied chairs
-      if (table.occupiedChairs >= table.chairs) {
-        table.status = "reserved";
-      } else if (table.occupiedChairs === 0) {
-        table.status = "available";
-      } else {
-        // If some chairs are occupied but not full, keep current status or set to a different one if needed
-        // For now, keep current status if not full and not empty
-      }
     }
 
     await table.save();

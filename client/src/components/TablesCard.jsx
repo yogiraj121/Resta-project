@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import styles from "../styles";
 
-const API_URL = "https://resta-project-2.onrender.com/api/tables";
+const API_URL = "http://localhost:5000/api/tables";
 
 const TablesCard = () => {
   const [tables, setTables] = useState([]);
@@ -58,7 +58,6 @@ const TablesCard = () => {
               </div>
               {table?.chairs && (
                 <div style={{ fontSize: "10px", marginTop: "2px" }}>
-                  {table.chairs} chairs
                 </div>
               )}
             </div>
