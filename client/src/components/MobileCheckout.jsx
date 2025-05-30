@@ -238,11 +238,11 @@ const MobileCheckout = () => {
       const response = await fetch(
         "https://resta-project-2.onrender.com/api/orders/",
         {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(orderData),
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(orderData),
         }
       );
 

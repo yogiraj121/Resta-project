@@ -90,7 +90,7 @@ const RevenueChart = () => {
               style={{ fontSize: "0.9em", color: "#666", margin: "5px 0 0 0" }}
             >
               Total: ₹{revenueData.total.toFixed(2)}
-            </p>
+          </p>
           )}
         </div>
         <div
@@ -169,103 +169,103 @@ const RevenueChart = () => {
             No data available
           </div>
         ) : (
-          <svg viewBox="0 0 400 200" style={{ width: "100%", height: "100%" }}>
-            {/* Shaded area for the last data point */}
-            {lastDataIndex !== -1 && selectedPeriod === "Daily" && (
-              <rect
-                x={
-                  (lastDataIndex * 400) /
-                    (revenueData.data.length > 1
-                      ? revenueData.data.length - 1
-                      : 1) -
-                  400 /
-                    (revenueData.data.length > 1
-                      ? revenueData.data.length - 1
-                      : 1) /
-                    2
-                }
-                y="0"
-                width={
-                  400 /
+        <svg viewBox="0 0 400 200" style={{ width: "100%", height: "100%" }}>
+          {/* Shaded area for the last data point */}
+          {lastDataIndex !== -1 && selectedPeriod === "Daily" && (
+            <rect
+              x={
+                (lastDataIndex * 400) /
+                  (revenueData.data.length > 1
+                    ? revenueData.data.length - 1
+                    : 1) -
+                400 /
+                  (revenueData.data.length > 1
+                    ? revenueData.data.length - 1
+                    : 1) /
+                  2
+              }
+              y="0"
+              width={
+                400 /
                   (revenueData.data.length > 1
                     ? revenueData.data.length - 1
                     : 1)
-                }
-                height="200"
-                fill="rgba(0,0,0,0.05)"
-              />
-            )}
-            <path
-              d={generatePath(revenueData.data)}
-              fill="none"
-              stroke="#333"
-              strokeWidth="2"
+              }
+              height="200"
+              fill="rgba(0,0,0,0.05)"
             />
-            {/* Add bars for daily view */}
-            {selectedPeriod === "Daily" &&
-              revenueData.data.length > 0 &&
-              revenueData.labels.length === 7 &&
-              revenueData.data.map((revenue, index) => {
-                const maxRevenue = Math.max(...revenueData.data, 1);
-                const barWidth = 400 / 7; // Divide width by 7 days
-                const x = index * barWidth + barWidth / 4; // Position bar with some spacing
-                const barHeight = (revenue / maxRevenue) * 180; // Scale height
-                const y = 200 - barHeight; // Position from bottom
+          )}
+          <path
+            d={generatePath(revenueData.data)}
+            fill="none"
+            stroke="#333"
+            strokeWidth="2"
+          />
+          {/* Add bars for daily view */}
+          {selectedPeriod === "Daily" &&
+            revenueData.data.length > 0 &&
+            revenueData.labels.length === 7 &&
+            revenueData.data.map((revenue, index) => {
+              const maxRevenue = Math.max(...revenueData.data, 1);
+              const barWidth = 400 / 7; // Divide width by 7 days
+              const x = index * barWidth + barWidth / 4; // Position bar with some spacing
+              const barHeight = (revenue / maxRevenue) * 180; // Scale height
+              const y = 200 - barHeight; // Position from bottom
 
-                return (
-                  <rect
-                    key={index}
-                    x={x}
-                    y={y}
-                    width={barWidth / 2} // Make bars half the width for spacing
-                    height={barHeight}
-                    fill="#666" // Color for the bars
-                  />
-                );
-              })}
-            {/* Add bars for weekly view */}
-            {selectedPeriod === "Weekly" &&
-              revenueData.data.length === 7 &&
-              revenueData.data.map((revenue, index) => {
-                const maxRevenue = Math.max(...revenueData.data, 1);
+              return (
+                <rect
+                  key={index}
+                  x={x}
+                  y={y}
+                  width={barWidth / 2} // Make bars half the width for spacing
+                  height={barHeight}
+                  fill="#666" // Color for the bars
+                />
+              );
+            })}
+          {/* Add bars for weekly view */}
+          {selectedPeriod === "Weekly" &&
+            revenueData.data.length === 7 &&
+            revenueData.data.map((revenue, index) => {
+              const maxRevenue = Math.max(...revenueData.data, 1);
                 const barWidth = 400 / 7; // Divide width by 7 weeks
-                const x = index * barWidth + barWidth / 4; // Position bar with some spacing
-                const barHeight = (revenue / maxRevenue) * 180; // Scale height
-                const y = 200 - barHeight; // Position from bottom
+              const x = index * barWidth + barWidth / 4; // Position bar with some spacing
+              const barHeight = (revenue / maxRevenue) * 180; // Scale height
+              const y = 200 - barHeight; // Position from bottom
 
-                return (
-                  <rect
-                    key={index}
-                    x={x}
-                    y={y}
-                    width={barWidth / 2} // Make bars half the width for spacing
-                    height={barHeight}
+              return (
+                <rect
+                  key={index}
+                  x={x}
+                  y={y}
+                  width={barWidth / 2} // Make bars half the width for spacing
+                  height={barHeight}
                     fill="#999" // Color for the weekly bars
-                  />
-                );
-              })}
-            {/* Add bars for monthly view */}
-            {selectedPeriod === "Monthly" &&
+                />
+              );
+            })}
+          {/* Add bars for monthly view */}
+          {selectedPeriod === "Monthly" &&
               revenueData.data.length === 7 &&
-              revenueData.data.map((revenue, index) => {
-                const maxRevenue = Math.max(...revenueData.data, 1);
+            revenueData.data.map((revenue, index) => {
+              const maxRevenue = Math.max(...revenueData.data, 1);
                 const barWidth = 400 / 7; // Divide width by 7 months
-                const x = index * barWidth + barWidth / 4; // Position bar with some spacing
-                const barHeight = (revenue / maxRevenue) * 180; // Scale height
-                const y = 200 - barHeight; // Position from bottom
+              const x = index * barWidth + barWidth / 4; // Position bar with some spacing
+              const barHeight = (revenue / maxRevenue) * 180; // Scale height
+              const y = 200 - barHeight; // Position from bottom
 
-                return (
-                  <rect
-                    key={index}
-                    x={x}
-                    y={y}
-                    width={barWidth / 2} // Make bars half the width for spacing
-                    height={barHeight}
+              return (
+                <rect
+                  key={index}
+                  x={x}
+                  y={y}
+                  width={barWidth / 2} // Make bars half the width for spacing
+                  height={barHeight}
                     fill="#c5c5c5" // Color for the monthly bars
-                  />
-                );
-              })}
-          </svg>
+                />
+              );
+            })}
+        </svg>
         )}
         <div
           style={{

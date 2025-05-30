@@ -27,7 +27,7 @@ const TablesManager = () => {
       console.error("Error fetching tables:", err);
       setError(err.response?.data?.error || "Failed to load tables");
     } finally {
-      setLoading(false);
+    setLoading(false);
     }
   };
 
