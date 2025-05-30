@@ -68,7 +68,6 @@ cd server
 npm install
 ```
 
-
 4. Start the server
 
 ```bash
@@ -95,7 +94,6 @@ npm install
 npm start
 ```
 
-
 ## 🛠️ Tech Stack
 
 ### Frontend
@@ -121,7 +119,6 @@ npm start
 - Fully responsive design
 - Optimized for both desktop and mobile devices
 - Touch-friendly interface
-
 
 ## 🤝 Contributing
 
