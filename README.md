@@ -38,7 +38,7 @@ A full-stack restaurant management system built with React, Node.js, and MongoDB
 
 ## 🚀 Live Demo
 
-Visit our live demo: [Restaurant Management System](https://resta-project-2.onrender.com)
+Visit our live demo: [Restaurant Management System](https://resta-project.vercel.app/)
 
 ## 🔧 Setup Instructions
 
