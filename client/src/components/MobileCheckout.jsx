@@ -249,8 +249,7 @@ const MobileCheckout = () => {
       if (response.ok) {
         const result = await response.json();
         alert(
-          "Order placed successfully!\nAssigned Chef: " +
-            result.order.assignedChef
+          "Order placed successfully!"
         );
         clearOrder(); // Clear the order after successful placement
         navigate("/m"); // Navigate to mobile menu after successful order
